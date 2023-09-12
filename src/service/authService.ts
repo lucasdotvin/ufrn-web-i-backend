@@ -19,11 +19,13 @@ export class AuthService {
         return token;
     }
 
-    public verifyToken(token: string): string|null {
-        const decoded = jwt.verify(token, this.appKey);
+    public verifyToken(token: string): number|null {
+        try {
+            const decoded = jwt.verify(token, this.appKey) as {id: number};
 
-        console.log(decoded);
-
-        return decoded as string;
+            return decoded.id;
+        } catch (e) {
+            return null;
+        }
     }
 }

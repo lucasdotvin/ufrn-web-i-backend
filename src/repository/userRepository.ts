@@ -8,7 +8,7 @@ export class UserRepository {
         this.database = database;
     }
     
-    public async find(id: number): Promise<User> {
+    public async find(id: number): Promise<User|undefined> {
         return new Promise((resolve, reject) => {
             this.database.get<User>(
                 "SELECT * FROM users WHERE id = ? LIMIT 1",
@@ -23,14 +23,7 @@ export class UserRepository {
             this.database.get<User>(
                 "SELECT * FROM users WHERE email = ? LIMIT 1",
                 [email],
-                (err, row) => {
-                    if (err) {
-                        reject(err);
-                        return;
-                    }
-
-                    resolve(row);
-                }
+                (err, row) => err ? reject(err) : resolve(row)
             );
         });
     }

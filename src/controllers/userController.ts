@@ -1,6 +1,7 @@
 import { UserService } from "../service/userService";
 import { Request, Response } from 'express';
 import { AuthService } from "../service/authService";
+import {AuthenticatedRequest} from "../middleware/authMiddleware";
 
 export class UserController {
     private userService: UserService;
@@ -53,6 +54,30 @@ export class UserController {
                     email: user.email
                 },
                 token,
+            });
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                response.json({ error: error.message });
+                return;
+            }
+
+            response.json({ error: 'Unknown error' });
+        }
+    }
+
+    public async me (request: Request, response: Response) {
+        const userId = (request as AuthenticatedRequest).userId;
+
+        try {
+            const user = await this.userService.find(userId);
+
+            response.json({
+                msg: 'User found',
+                user: {
+                    id: user.id,
+                    name: user.name,
+                    email: user.email
+                }
             });
         } catch (error: unknown) {
             if (error instanceof Error) {

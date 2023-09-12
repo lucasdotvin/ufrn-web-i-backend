@@ -7,6 +7,7 @@ import { UserService } from './service/userService';
 import { UserController } from './controllers/userController';
 import { validate } from './validation';
 import { AuthService } from './service/authService';
+import {AuthMiddleware} from "./middleware/authMiddleware";
 
 dotenv.config();
 
@@ -18,6 +19,8 @@ const userRepository = new UserRepository(database);
 
 const userService = new UserService(userRepository);
 const authService = new AuthService(process.env.APP_KEY ?? '', parseInt(process.env.AUTH_TOKEN_DURATION_SECONDS ?? '86400'));
+
+const authMiddleware = new AuthMiddleware(authService);
 
 const userController = new UserController(userService, authService);
 
@@ -43,6 +46,8 @@ app.post('/sign-in', validate([
     body('email').isEmail(),
     body('password').isString().isLength({ min: 8 })
 ]), userController.signIn.bind(userController));
+
+app.get('/me', authMiddleware.handle.bind(authMiddleware), userController.me.bind(userController));
 
 app.listen(port, () => {
     console.log(`[!] Server running at port ${port}`);

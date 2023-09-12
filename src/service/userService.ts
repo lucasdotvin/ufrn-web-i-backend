@@ -42,6 +42,16 @@ export class UserService {
         return foundUser;
     }
 
+    public async find(id: number): Promise<User> {
+        const foundUser = await this.userRepository.find(id);
+
+        if (foundUser === undefined) {
+            throw new Error('User not found');
+        }
+
+        return foundUser;
+    }
+
     private async comparePassword(plainPassword: string, hashedPassword: string): Promise<boolean> {
         return await compare(plainPassword, hashedPassword);
     }
