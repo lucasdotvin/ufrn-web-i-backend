@@ -11,3 +11,6 @@ dist
 # ide
 .idea
 .vscode
+
+# Mac
+.DS_Store

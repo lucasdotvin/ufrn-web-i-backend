@@ -18,29 +18,35 @@ export class UserRepository {
         });
     }
 
-    public async findByEmail(email: string): Promise<User> {
+    public async findByEmail(email: string): Promise<User|undefined> {
         return new Promise((resolve, reject) => {
             this.database.get<User>(
                 "SELECT * FROM users WHERE email = ? LIMIT 1",
                 [email],
-                (err, row) => err ? reject(err) : resolve(row)
+                (err, row) => {
+                    if (err) {
+                        reject(err);
+                        return;
+                    }
+
+                    resolve(row);
+                }
             );
         });
     }
 
-    public async create(user: User): Promise<User> {
+    public async store(name: string, email: string, password: string): Promise<number> {
         return new Promise((resolve, reject) => {
             this.database.run(
                 "INSERT INTO users (name, email, password) VALUES (?, ?, ?)",
-                [user.name, user.email, user.password],
+                [name, email, password],
                 function(err) {
                     if (err) {
                         reject(err);
                         return;
                     }
 
-                    user.id = this.lastID;
-                    resolve(user);
+                    resolve(this.lastID);
                 }
             );
         });
