@@ -8,6 +8,9 @@ import { UserController } from './controllers/userController';
 import { validate } from './validation';
 import { AuthService } from './service/authService';
 import {AuthMiddleware} from "./middleware/authMiddleware";
+import {MedicineRepository} from "./repository/medicineRepository";
+import {MedicineService} from "./service/medicineService";
+import {MedicineController} from "./controllers/medicineController";
 
 dotenv.config();
 
@@ -16,13 +19,16 @@ const port = process.env.APP_PORT;
 const database = newDatabase(process.env.DATABASE_URI ?? ':memory:');
 
 const userRepository = new UserRepository(database);
+const medicineRepository = new MedicineRepository(database);
 
 const userService = new UserService(userRepository);
 const authService = new AuthService(process.env.APP_KEY ?? '', parseInt(process.env.AUTH_TOKEN_DURATION_SECONDS ?? '86400'));
+const medicineService = new MedicineService(medicineRepository);
 
 const authMiddleware = new AuthMiddleware(authService);
 
 const userController = new UserController(userService, authService);
+const medicineController = new MedicineController(medicineService);
 
 app.use(express.json());
 
@@ -48,6 +54,22 @@ app.post('/sign-in', validate([
 ]), userController.signIn.bind(userController));
 
 app.get('/me', authMiddleware.handle.bind(authMiddleware), userController.me.bind(userController));
+
+app.get('/medicines', authMiddleware.handle.bind(authMiddleware), medicineController.index.bind(medicineController));
+
+app.post(
+    '/medicines',
+    [
+        authMiddleware.handle.bind(authMiddleware),
+        validate([
+            body('name').isString().isLength({ min: 4 }),
+            body('periodicity').isFloat({ gt: 0 }),
+            body('startedAt').isISO8601().toDate(),
+            body('units').isInt({ min: 1 }),
+        ]),
+    ],
+    medicineController.create.bind(medicineController),
+);
 
 app.listen(port, () => {
     console.log(`[!] Server running at port ${port}`);

@@ -12,6 +12,19 @@ export const newDatabase = (uri: string): Database => {
                 password TEXT NOT NULL
             )
         `);
+
+        database.run(`
+            CREATE TABLE IF NOT EXISTS medicines (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                name TEXT NOT NULL,
+                periodicity INTEGER NOT NULL,
+                units INTEGER NOT NULL,
+                started_at TIMESTAMP,
+                
+                FOREIGN KEY(user_id) REFERENCES users(id)
+            )
+        `);
     });
 
     return database;

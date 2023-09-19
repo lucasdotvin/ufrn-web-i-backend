@@ -2,13 +2,17 @@ import { UserService } from "../service/userService";
 import { Request, Response } from 'express';
 import { AuthService } from "../service/authService";
 import {AuthenticatedRequest} from "../middleware/authMiddleware";
+import { Controller } from "./controller";
+import {UserResource} from "../resources/userResource";
 
-export class UserController {
+export class UserController extends Controller{
     private userService: UserService;
 
     private authService: AuthService;
 
     constructor(userService: UserService, authService: AuthService) {
+        super();
+
         this.userService = userService;
         this.authService = authService;
     }
@@ -22,20 +26,11 @@ export class UserController {
         
             response.json({
                 msg: 'User created successfully',
-                user: {
-                    id: user.id,
-                    name: user.name,
-                    email: user.email
-                },
+                user: UserResource.fromUser(user),
                 token,
             });
         } catch (error: unknown) {
-            if (error instanceof Error) {
-                response.json({ error: error.message });
-                return;
-            }
-
-            response.json({ error: 'Unknown error' });
+            this.handleError(request, response, error)
         }
     }
 
@@ -48,20 +43,11 @@ export class UserController {
         
             response.json({
                 msg: 'User signed in successfully',
-                user: {
-                    id: user.id,
-                    name: user.name,
-                    email: user.email
-                },
+                user: UserResource.fromUser(user),
                 token,
             });
         } catch (error: unknown) {
-            if (error instanceof Error) {
-                response.json({ error: error.message });
-                return;
-            }
-
-            response.json({ error: 'Unknown error' });
+            this.handleError(request, response, error)
         }
     }
 
@@ -73,19 +59,10 @@ export class UserController {
 
             response.json({
                 msg: 'User found',
-                user: {
-                    id: user.id,
-                    name: user.name,
-                    email: user.email
-                }
+                user: UserResource.fromUser(user),
             });
         } catch (error: unknown) {
-            if (error instanceof Error) {
-                response.json({ error: error.message });
-                return;
-            }
-
-            response.json({ error: 'Unknown error' });
+            this.handleError(request, response, error)
         }
     }
 }
