@@ -12,6 +12,7 @@ import {MedicineRepository} from "./repository/medicineRepository";
 import {MedicineService} from "./service/medicineService";
 import {MedicineController} from "./controllers/medicineController";
 import {createConnection} from "mysql2";
+import cors from 'cors'
 
 dotenv.config();
 
@@ -31,6 +32,7 @@ const authMiddleware = new AuthMiddleware(authService);
 const userController = new UserController(userService, authService);
 const medicineController = new MedicineController(medicineService);
 
+app.use(cors())
 app.use(express.json());
 
 app.get('/', (request: Request, response: Response) => {
