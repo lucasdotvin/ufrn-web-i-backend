@@ -24,7 +24,7 @@ export class MedicineController extends Controller{
                 medicines: medicines.map(MedicineResource.fromMedicine),
             });
         } catch (error: unknown) {
-            this.handleError(request, response, error)
+            this.handleError(request, response, error, 500)
         }
     }
 
@@ -40,7 +40,7 @@ export class MedicineController extends Controller{
                 medicine: MedicineResource.fromMedicine(medicine),
             });
         } catch (error: unknown) {
-            this.handleError(request, response, error)
+            this.handleError(request, response, error, 500)
         }
     }
 }

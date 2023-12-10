@@ -30,7 +30,7 @@ export class UserController extends Controller{
                 token,
             });
         } catch (error: unknown) {
-            this.handleError(request, response, error)
+            this.handleError(request, response, error, 400)
         }
     }
 
@@ -47,7 +47,7 @@ export class UserController extends Controller{
                 token,
             });
         } catch (error: unknown) {
-            this.handleError(request, response, error)
+            this.handleError(request, response, error, 400)
         }
     }
 
@@ -62,7 +62,7 @@ export class UserController extends Controller{
                 user: UserResource.fromUser(user),
             });
         } catch (error: unknown) {
-            this.handleError(request, response, error)
+            this.handleError(request, response, error, 400)
         }
     }
 }
