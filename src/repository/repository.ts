@@ -1,44 +1,56 @@
 import {Database} from "sqlite3";
+import {Connection} from "mysql2";
 
 export abstract class Repository {
-    private database: Database;
+    private connection: Connection;
 
-    public constructor(database: Database) {
-        this.database = database;
+    public constructor(connection: Connection) {
+        this.connection = connection;
     }
 
     protected findWhere(query: string, parameters: Array<string|number>): Promise<unknown> {
         return new Promise((resolve, reject) => {
-            this.database.get(
+            this.connection.query(
                 query,
                 parameters,
-                (err, row) => err ? reject(err) : resolve(row)
+                (err, row) => {
+                    if (err) {
+                        reject(err);
+                        return;
+                    }
+
+                    const result = row as any;
+
+                    resolve(result[0]);
+                }
             );
         });
     }
 
     protected getAllWhere(query: string, parameters: Array<string|number>): Promise<Array<unknown>> {
         return new Promise((resolve, reject) => {
-            this.database.all(
+            this.connection.query(
                 query,
                 parameters,
-                (err, rows) => err ? reject(err) : resolve(rows)
+                (err, rows) => err ? reject(err) : resolve(rows as any)
             );
         });
     }
 
     protected insert(query: string, parameters: Array<string|number|Date>): Promise<number> {
         return new Promise((resolve, reject) => {
-            this.database.run(
+            this.connection.query(
                 query,
                 parameters,
-                function(err) {
+                (err, row) => {
                     if (err) {
                         reject(err);
                         return;
                     }
 
-                    resolve(this.lastID);
+                    const result = row as any;
+
+                    resolve(result.insertId);
                 }
             );
         });

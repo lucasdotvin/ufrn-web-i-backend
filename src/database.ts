@@ -1,31 +1,27 @@
-import { Database } from "sqlite3";
+import {Connection, createConnection} from "mysql2";
 
-export const newDatabase = (uri: string): Database => {
-    const database = new Database(uri);
+export const newDatabase = (uri: string): Connection => {
+    const database = createConnection(uri);
 
-    database.serialize(() => {
-        database.run(`
-            CREATE TABLE IF NOT EXISTS users (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL,
-                email TEXT NOT NULL,
-                password TEXT NOT NULL
-            )
-        `);
+    database.query(`
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTO_INCREMENT,
+            name TEXT NOT NULL,
+            email TEXT NOT NULL,
+            password TEXT NOT NULL
+        )
+    `);
 
-        database.run(`
-            CREATE TABLE IF NOT EXISTS medicines (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                user_id INTEGER NOT NULL,
-                name TEXT NOT NULL,
-                periodicity INTEGER NOT NULL,
-                units INTEGER NOT NULL,
-                started_at TIMESTAMP,
-                
-                FOREIGN KEY(user_id) REFERENCES users(id)
-            )
-        `);
-    });
+    database.query(`
+        CREATE TABLE IF NOT EXISTS medicines (
+            id INTEGER PRIMARY KEY AUTO_INCREMENT,
+            user_id INTEGER NOT NULL,
+            name TEXT NOT NULL,
+            periodicity INTEGER NOT NULL,
+            units INTEGER NOT NULL,
+            started_at TIMESTAMP
+        )
+    `);
 
     return database;
 }

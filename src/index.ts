@@ -11,12 +11,13 @@ import {AuthMiddleware} from "./middleware/authMiddleware";
 import {MedicineRepository} from "./repository/medicineRepository";
 import {MedicineService} from "./service/medicineService";
 import {MedicineController} from "./controllers/medicineController";
+import {createConnection} from "mysql2";
 
 dotenv.config();
 
 const app = express();
 const port = process.env.APP_PORT;
-const database = newDatabase(process.env.DATABASE_URI ?? ':memory:');
+const database = newDatabase(process.env.DATABASE_URI ?? '')
 
 const userRepository = new UserRepository(database);
 const medicineRepository = new MedicineRepository(database);
